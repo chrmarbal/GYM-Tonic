@@ -26,7 +26,7 @@ function wrapAsync(fn) {
 
 // #region FINDALL - CSR
 /* <=============================== 2. FINDALLGROUPS ===============================> */
-// Buscamos todos los usuarios y renderizamos la vista principal (index.ejs).
+// Buscamos todos los grupos.
 exports.findAllGroupsCSR = wrapAsync(async function (req,res,next) { 
     // Espera una promesa de lo que devuelva la función "findAll" del modelo.
     await groupmodel.findAll(async function(err, datosGroups){
@@ -40,12 +40,11 @@ exports.findAllGroupsCSR = wrapAsync(async function (req,res,next) {
 
 // #region FIND-ID - CSR
 /* <=============================== 3. FINDGROUPBYID ===============================> */
-// Buscamos los grupos por "id" y traemos también los datos de la compañía a la que pertenece.
+// Buscamos los grupos por "id".
 exports.findGroupByIdCSR = wrapAsync(async function (req,res,next){
     // Traemos por parámetro el id enviado como parámetro por la ruta.
     const {id} = req.params
     const userLogued = req.session.userLogued.data;
-    // console.log(id);
     // Espera una promesa de lo que devuelva la función "findById" del modelo.
     if(!userLogued){
         return next(new AppError("No estás registrado!", 403))
@@ -68,15 +67,13 @@ exports.findGroupByIdCSR = wrapAsync(async function (req,res,next){
 
 // #region UPDATE - CSR
 /* <=============================== 5. UPDATEGROUP ===============================> */
-// Actualizamos el grupo una vez completamos el edit y lo enviamos.
+// Actualizamos el grupo.
 exports.updateGroupCSR = wrapAsync(async function (req,res, next) {    
     const {id} = req.params
     let { name } = req.body
 
     console.log("id", id);
 
-
-    // OBJETO QUE LUEGO UTILIZAREMOS PARA EL OBJETO SESSION
     let completeGroup    
    
     /* <================== PARTE 1 ==================> */
