@@ -1,27 +1,29 @@
 /* ============================================================
-   GymTonic - SCRIPT DEFINITIVO Y LIMPIO
+   GymTonic - SCRIPT DEFINITIVO Y PORTABLE
+   - Login SQL: gymtonic
+   - Password : gintonic
+   - Compatible con todos los equipos
    ============================================================ */
 
 USE master;
 GO
 
 ----------------------------------------------------------
--- 0. ASEGURAR LOGIN SQL LIMPIO
+-- 0. CREAR LOGIN SQL (SI NO EXISTE)
 ----------------------------------------------------------
-IF EXISTS (SELECT * FROM sys.server_principals WHERE name = 'gymtonic')
+IF NOT EXISTS (
+    SELECT 1 FROM sys.server_principals WHERE name = 'gymtonic'
+)
 BEGIN
-    DROP LOGIN gymtonic;
+    CREATE LOGIN gymtonic
+    WITH PASSWORD = 'gintonic',
+         CHECK_POLICY = OFF,
+         CHECK_EXPIRATION = OFF;
 END
 GO
 
-CREATE LOGIN gymtonic
-WITH PASSWORD = 'gintonic',
-     CHECK_POLICY = OFF,
-     CHECK_EXPIRATION = OFF;
-GO
-
 ----------------------------------------------------------
--- 1. ELIMINAR BD SI EXISTE
+-- 1. ELIMINAR BASE DE DATOS SI EXISTE
 ----------------------------------------------------------
 IF DB_ID('GymTonic') IS NOT NULL
 BEGIN
@@ -31,35 +33,31 @@ END
 GO
 
 ----------------------------------------------------------
--- 2. CREAR BD Y ASIGNAR OWNER
+-- 2. CREAR BASE DE DATOS
 ----------------------------------------------------------
 CREATE DATABASE GymTonic;
-GO
-
-ALTER AUTHORIZATION ON DATABASE::GymTonic TO gymtonic;
 GO
 
 USE GymTonic;
 GO
 
 ----------------------------------------------------------
--- 3. CREAR USUARIO LIMPIO Y PERMISOS
+-- 3. CREAR USUARIO EN LA BD Y DAR PERMISOS
 ----------------------------------------------------------
-IF EXISTS (SELECT * FROM sys.database_principals WHERE name = 'gymtonic')
+IF NOT EXISTS (
+    SELECT 1 FROM sys.database_principals WHERE name = 'gymtonic'
+)
 BEGIN
-    DROP USER gymtonic;
+    CREATE USER gymtonic FOR LOGIN gymtonic;
 END
-GO
-
-CREATE USER gymtonic FOR LOGIN gymtonic;
 GO
 
 ALTER ROLE db_owner ADD MEMBER gymtonic;
 GO
 
-----------------------------------------------------------
--- 4. TABLAS
-----------------------------------------------------------
+/* ============================================================
+   4. TABLAS PRINCIPALES
+   ============================================================ */
 
 CREATE TABLE dbo.Users
 (
@@ -119,9 +117,9 @@ CREATE TABLE dbo.Groups
 );
 GO
 
-----------------------------------------------------------
--- 5. RELACIONES
-----------------------------------------------------------
+/* ============================================================
+   5. TABLAS RELACIONALES
+   ============================================================ */
 
 CREATE TABLE dbo.Routine_X_Exercise
 (
@@ -190,6 +188,29 @@ GO
 -- 6. ADMIN POR DEFECTO
 ----------------------------------------------------------
 INSERT INTO dbo.Users
+(
+    user_username,
+    user_name,
+    user_password,
+    user_birthdate,
+    user_email,
+    user_height,
+    user_weight,
+    user_objective,
+    user_points,
+    user_role
+)
 VALUES
-('admin','Administrador','$2b$12$bvvrPTWlj.GC8RDiz3ZtRezksJJVtvmB9GVzJBQUBQfc6ZUxfNExG','1990-01-01','admin@gymtonic.com',0,0,0,0,1);
+(
+    'admin',
+    'Administrador',
+    '$2b$12$bvvrPTWlj.GC8RDiz3ZtRezksJJVtvmB9GVzJBQUBQfc6ZUxfNExG',
+    '1990-01-01',
+    'admin@gymtonic.com',
+    0,
+    0,
+    0,
+    0,
+    1
+);
 GO
