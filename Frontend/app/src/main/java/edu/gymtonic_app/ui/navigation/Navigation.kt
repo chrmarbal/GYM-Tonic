@@ -1,6 +1,7 @@
 package edu.gymtonic_app.ui.navigation
 
-
+import RegisterScreen
+import RegisterScreen2
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -20,7 +21,7 @@ fun Navigation() {
         composable(Routes.WELCOME) {
             GymTonicLoginScreen(
                 onLogin = { navController.navigate(Routes.LOGIN_FORM) },
-                onRegister = { /* si tienes register route: navController.navigate(...) */ },
+                onRegister = { navController.navigate(Routes.REGISTER) },
                 onGoogle = { },
                 onFacebook = { }
             )
@@ -31,13 +32,32 @@ fun Navigation() {
                 onEnter = {
                     // cuando tengas HOME:
                     // navController.navigate(Routes.HOME)
-                    // de momento, para probar puedes volver:
-                    // navController.popBackStack()
                 },
-                onRegister = { /* navController.navigate("register") */ },
-                onForgotPassword = { /* navController.navigate("forgot") */ }
+                onRegister = { navController.navigate(Routes.REGISTER) },
+                onForgotPassword = { }
             )
         }
 
+        // ✅ Paso 1 del registro
+        composable(Routes.REGISTER) {
+            RegisterScreen(
+                onNext = { navController.navigate(Routes.REGISTER2) },
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        //  Paso 2 del registro
+        composable(Routes.REGISTER2) {
+            RegisterScreen2(
+                onEnter = {
+                    // De momento te llevo a WELCOME (cámbialo por HOME cuando lo tengas)
+                    navController.navigate(Routes.WELCOME) {
+                        popUpTo(Routes.REGISTER) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                },
+                onBack = { navController.popBackStack() }
+            )
+        }
     }
 }
